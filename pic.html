@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pictionary Party</title>
+
+<style>
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #222;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   MAIN CONTAINER
+===================================================== */
+
+.container {
+    width: 94%;
+    max-width: 900px;
+    margin: auto;
+    padding: 25px 0 40px;
+}
+
+
+/* =====================================================
+   SCREENS
+===================================================== */
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card {
+    background: white;
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+}
+
+
+/* =====================================================
+   HEADINGS
+===================================================== */
+
+h1 {
+    text-align: center;
+    font-size: 42px;
+    color: #5b4bdb;
+    margin-bottom: 10px;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 30px;
+}
+
+
+/* =====================================================
+   SETUP
+===================================================== */
+
+.player-input {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0 20px;
+}
+
+.player-input input {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+.player-input input:focus {
+    border-color: #667eea;
+}
+
+.add-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background: #5747d2;
+}
+
+.players-list {
+    list-style: none;
+    margin-bottom: 25px;
+}
+
+.players-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f3f3ff;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.remove-btn {
+    background: #ff5b5b;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+}
+
+.remove-btn:hover {
+    background: #e04444;
+}
+
+.rules-box {
+    background: #f7f7ff;
+    padding: 18px;
+    border-radius: 15px;
+    line-height: 1.7;
+    color: #555;
+}
+
+.start-btn {
+    width: 100%;
+    margin-top: 25px;
+    background: #5b4bdb;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.start-btn:hover {
+    background: #4939c7;
+}
+
+
+/* =====================================================
+   GAME HEADER
+===================================================== */
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.player-badge {
+    background: #eeeeff;
+    color: #5b4bdb;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.round-badge {
+    background: #f5f5f5;
+    padding: 10px 15px;
+    border-radius: 12px;
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+.timer {
+    text-align: center;
+    font-size: 64px;
+    font-weight: bold;
+    color: #5b4bdb;
+    margin: 5px 0 10px;
+}
+
+.timer.warning {
+    color: #e04444;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+    50% {
+        transform: scale(1.08);
+    }
+
+}
+
+
+/* =====================================================
+   TURN INFORMATION
+===================================================== */
+
+.turn-info {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+
+/* =====================================================
+   WORD CHOICES
+===================================================== */
+
+.choice-title {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.word-choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.word-card {
+    padding: 28px 15px;
+    border-radius: 18px;
+    text-align: center;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.word-card:hover {
+    transform: translateY(-5px);
+}
+
+.easy-card {
+    background: #e8fff2;
+    border-color: #35b875;
+}
+
+.medium-card {
+    background: #fff8dc;
+    border-color: #e2a600;
+}
+
+.hard-card {
+    background: #ffe9e9;
+    border-color: #df4b4b;
+}
+
+.level {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.easy-card .level {
+    color: #168653;
+}
+
+.medium-card .level {
+    color: #b17c00;
+}
+
+.hard-card .level {
+    color: #c52e2e;
+}
+
+.points {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.word {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   SELECTED WORD
+===================================================== */
+
+.selected-section {
+    display: none;
+    text-align: center;
+}
+
+.selected-section.active {
+    display: block;
+}
+
+.selected-label {
+    color: #999;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.selected-word {
+    font-size: 38px;
+    font-weight: bold;
+    color: #5b4bdb;
+    margin: 10px 0;
+}
+
+.selected-points {
+    color: #22a06b;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.done-btn {
+    width: 100%;
+    background: #22a06b;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 19px;
+    font-weight: bold;
+    margin-top: 25px;
+}
+
+.done-btn:hover {
+    background: #188657;
+}
+
+
+/* =====================================================
+   SCOREBOARD
+===================================================== */
+
+.scoreboard {
+    margin-top: 30px;
+}
+
+.scoreboard h3 {
+    margin-bottom: 10px;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f6f6f6;
+    border-radius: 10px;
+    margin-bottom: 7px;
+}
+
+.score-points {
+    font-weight: bold;
+    color: #5b4bdb;
+}
+
+
+/* =====================================================
+   TURN COMPLETE
+===================================================== */
+
+.turn-complete {
+    text-align: center;
+}
+
+.big-emoji {
+    font-size: 70px;
+    margin-bottom: 10px;
+}
+
+.turn-word {
+    margin-top: 15px;
+    color: #5b4bdb;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.turn-points {
+    margin-top: 8px;
+    color: #22a06b;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.next-btn {
+    width: 100%;
+    background: #5b4bdb;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 25px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.next-btn:hover {
+    background: #4939c7;
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+.game-over {
+    text-align: center;
+}
+
+.trophy {
+    font-size: 80px;
+}
+
+.winner {
+    font-size: 32px;
+    color: #5b4bdb;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.restart-btn {
+    width: 100%;
+    background: #5b4bdb;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 25px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+
+    .container {
+        width: 96%;
+        padding-top: 10px;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    .player-input {
+        flex-direction: column;
+    }
+
+    .game-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .timer {
+        font-size: 52px;
+    }
+
+    .word-choices {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-word {
+        font-size: 32px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+<!-- ==================================================
+     SETUP SCREEN
+================================================== -->
+
+<div id="setupScreen" class="screen active">
+
+<div class="card">
+
+<h1>🎨 Pictionary</h1>
+
+<p class="subtitle">
+Draw it in your head, describe it, and let the guessing begin!
+</p>
+
+
+<h2>👥 Add Players</h2>
+
+<div class="player-input">
+
+<input
+    id="playerInput"
+    type="text"
+    placeholder="Enter player name"
+    maxlength="20"
+>
+
+<button
+    class="add-btn"
+    onclick="addPlayer()"
+>
++ Add
+</button>
+
+</div>
+
+
+<ul
+    id="playersList"
+    class="players-list"
+></ul>
+
+
+<div class="rules-box">
+
+<strong>🎮 How to Play</strong>
+
+<br>
+
+🟢 Easy = <strong>1 point</strong>
+
+<br>
+
+🟡 Medium = <strong>2 points</strong>
+
+<br>
+
+🔴 Hard = <strong>3 points</strong>
+
+<br>
+
+⏱️ Each turn lasts <strong>60 seconds</strong>
+
+<br>
+
+🎲 Every player gets <strong>3 choices</strong>
+
+<br>
+
+🚫 Selected words never appear again
+
+</div>
+
+
+<button
+    class="start-btn"
+    onclick="startGame()"
+>
+🚀 Start Game
+</button>
+
+</div>
+
+</div>
+
+
+
+<!-- ==================================================
+     GAME SCREEN
+================================================== -->
+
+<div id="gameScreen" class="screen">
+
+<div class="card">
+
+
+<div class="game-header">
+
+<div class="player-badge">
+
+🎨
+<span id="currentPlayer">
+Player
+</span>
+
+</div>
+
+
+<div class="round-badge">
+
+Round
+<strong id="roundNumber">
+1
+</strong>
+
+</div>
+
+</div>
+
+
+<div
+id="timer"
+class="timer"
+>
+1:00
+</div>
+
+
+<div class="turn-info">
+
+Choose one word before the timer starts!
+
+</div>
+
+
+<!-- WORD CHOICES -->
+
+<div id="choiceArea">
+
+<h2 class="choice-title">
+Choose ONE word
+</h2>
+
+
+<div class="word-choices">
+
+
+<div
+id="easyChoice"
+class="word-card easy-card"
+onclick="chooseWord('easy')"
+>
+
+<div class="level">
+🟢 EASY
+</div>
+
+<div class="points">
+1 POINT
+</div>
+
+<div
+id="easyWord"
+class="word"
+>
+Word
+</div>
+
+</div>
+
+
+
+<div
+id="mediumChoice"
+class="word-card medium-card"
+onclick="chooseWord('medium')"
+>
+
+<div class="level">
+🟡 MEDIUM
+</div>
+
+<div class="points">
+2 POINTS
+</div>
+
+<div
+id="mediumWord"
+class="word"
+>
+Word
+</div>
+
+</div>
+
+
+
+<div
+id="hardChoice"
+class="word-card hard-card"
+onclick="chooseWord('hard')"
+>
+
+<div class="level">
+🔴 HARD
+</div>
+
+<div class="points">
+3 POINTS
+</div>
+
+<div
+id="hardWord"
+class="word"
+>
+Word
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- SELECTED WORD -->
+
+<div
+id="selectedSection"
+class="selected-section"
+>
+
+<div class="selected-label">
+Your chosen word
+</div>
+
+<div
+id="selectedWord"
+class="selected-word"
+>
+Word
+</div>
+
+<div
+id="selectedPoints"
+class="selected-points"
+>
+Worth 1 point
+</div>
+
+
+<button
+class="done-btn"
+onclick="finishTurn()"
+>
+✅ DONE / OK
+</button>
+
+</div>
+
+
+<!-- SCOREBOARD -->
+
+<div class="scoreboard">
+
+<h3>
+🏆 Scoreboard
+</h3>
+
+<div
+id="scoreboard"
+></div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<!-- ==================================================
+     TURN COMPLETE SCREEN
+================================================== -->
+
+<div id="turnScreen" class="screen">
+
+<div class="card turn-complete">
+
+<div class="big-emoji">
+🎉
+</div>
+
+<h1>
+Turn Complete!
+</h1>
+
+<p id="turnMessage">
+Great job!
+</p>
+
+<div
+id="turnWord"
+class="turn-word"
+>
+</div>
+
+<div
+id="turnPoints"
+class="turn-points"
+>
+</div>
+
+<button
+class="next-btn"
+onclick="nextPlayer()"
+>
+➡️ Next Player
+</button>
+
+</div>
+
+</div>
+
+
+
+<!-- ==================================================
+     GAME OVER SCREEN
+================================================== -->
+
+<div id="gameOverScreen" class="screen">
+
+<div class="card game-over">
+
+<div class="trophy">
+🏆
+</div>
+
+<h1>
+Game Over!
+</h1>
+
+<div
+id="winnerName"
+class="winner"
+>
+</div>
+
+<p>
+Final Scores
+</p>
+
+<div
+id="finalScores"
+class="scoreboard"
+>
+</div>
+
+<button
+class="restart-btn"
+onclick="restartGame()"
+>
+🔄 New Game
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   WORD DATABASE
+===================================================== */
+
+const wordBank = {
+
+    easy: [
+
+        "Apple",
+        "Ball",
+        "Cat",
+        "Dog",
+        "Sun",
+        "Moon",
+        "Star",
+        "House",
+        "Tree",
+        "Car",
+        "Bus",
+        "Book",
+        "Chair",
+        "Table",
+        "Phone",
+        "Cake",
+        "Pizza",
+        "Ice Cream",
+        "Flower",
+        "Fish",
+        "Bird",
+        "Cloud",
+        "Rain",
+        "Snow",
+        "Heart",
+        "Baby",
+        "School",
+        "Pencil",
+        "Clock",
+        "Shoe",
+        "Hat",
+        "Glasses",
+        "Key",
+        "Door",
+        "Window",
+        "Bed",
+        "Cup",
+        "Bottle",
+        "Banana",
+        "Orange",
+        "Carrot",
+        "Robot",
+        "Ghost",
+        "Crown",
+        "Rocket",
+        "Boat",
+        "Bicycle",
+        "Guitar",
+        "Camera",
+        "Umbrella"
+
+    ],
+
+
+    medium: [
+
+        "Airplane",
+        "Astronaut",
+        "Birthday Party",
+        "Beach",
+        "Camping",
+        "Detective",
+        "Firefighter",
+        "Football Match",
+        "Haunted House",
+        "Jungle",
+        "Lighthouse",
+        "Mermaid",
+        "Mountain Climbing",
+        "Movie Theater",
+        "Pirate Ship",
+        "Police Officer",
+        "Roller Coaster",
+        "Superhero",
+        "Treasure Chest",
+        "Volcano",
+        "Waterfall",
+        "Wedding",
+        "Zombie",
+        "Magic Wand",
+        "Snowman",
+        "Concert",
+        "Restaurant",
+        "Traffic Jam",
+        "Birthday Cake",
+        "School Bus",
+        "Shopping Mall",
+        "Computer Game",
+        "Fishing",
+        "Gardening",
+        "Cooking",
+        "Swimming",
+        "Skateboarding",
+        "Photography",
+        "Camping Tent",
+        "Hot Air Balloon",
+        "Parachute",
+        "Time Machine",
+        "Alien",
+        "Dinosaur",
+        "Castle",
+        "Dragon",
+        "Treasure Map",
+        "Wizard",
+        "Space Station",
+        "Pirate"
+
+    ],
+
+
+    hard: [
+
+        "Time Travel",
+        "Artificial Intelligence",
+        "Parallel Universe",
+        "Social Media",
+        "Climate Change",
+        "Quantum Physics",
+        "Secret Agent",
+        "Invisible Man",
+        "Déjà Vu",
+        "Broken Heart",
+        "Midlife Crisis",
+        "Reality Show",
+        "Nightmare",
+        "Identity Theft",
+        "Conspiracy Theory",
+        "Lost Civilization",
+        "Undercover Mission",
+        "End of the World",
+        "Virtual Reality",
+        "Alien Invasion",
+        "Zombie Apocalypse",
+        "Ancient Egypt",
+        "Black Hole",
+        "Gravity",
+        "Dream Sequence",
+        "Time Capsule",
+        "Treasure Hunt",
+        "Escape Room",
+        "Mystery Murder",
+        "Detective Story",
+        "Parallel Dimension",
+        "Robot Revolution",
+        "Space Exploration",
+        "Human Evolution",
+        "Global Warming",
+        "Internet Addiction",
+        "Celebrity Scandal",
+        "Magic Trick",
+        "Impossible Dream",
+        "Plot Twist",
+        "Breaking News",
+        "Traffic Accident",
+        "Secret Password",
+        "Ghost Story",
+        "Underwater City",
+        "Flying Car",
+        "Talking Animal",
+        "Invisible Cloak",
+        "Mind Reading"
+
+    ]
+
+};
+
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
+
+let players = [];
+
+let currentPlayerIndex = 0;
+
+let currentRound = 1;
+
+let usedWords = new Set();
+
+let selectedWord = "";
+
+let selectedLevel = "";
+
+let selectedPoints = 0;
+
+let timerInterval = null;
+
+let timeLeft = 60;
+
+let turnFinished = false;
+
+
+/* =====================================================
+   ADD PLAYER
+===================================================== */
+
+function addPlayer() {
+
+    const input =
+        document.getElementById("playerInput");
+
+    const name =
+        input.value.trim();
+
+
+    if (name === "") {
+
+        alert("Please enter a player name.");
+
+        return;
+
+    }
+
+
+    if (players.length >= 20) {
+
+        alert("Maximum 20 players.");
+
+        return;
+
+    }
+
+
+    players.push({
+
+        name: name,
+
+        score: 0
+
+    });
+
+
+    input.value = "";
+
+    updatePlayers();
+
+}
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+document
+    .getElementById("playerInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                addPlayer();
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   UPDATE PLAYER LIST
+===================================================== */
+
+function updatePlayers() {
+
+    const list =
+        document.getElementById(
+            "playersList"
+        );
+
+
+    list.innerHTML = "";
+
+
+    players.forEach(function(player, index) {
+
+        const li =
+            document.createElement("li");
+
+
+        li.innerHTML = `
+
+            <span>
+                👤 ${escapeHTML(player.name)}
+            </span>
+
+            <button
+                class="remove-btn"
+                onclick="removePlayer(${index})"
+            >
+                Remove
+            </button>
+
+        `;
+
+
+        list.appendChild(li);
+
+    });
+
+}
+
+
+/* =====================================================
+   REMOVE PLAYER
+===================================================== */
+
+function removePlayer(index) {
+
+    players.splice(index, 1);
+
+    updatePlayers();
+
+}
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+function startGame() {
+
+    if (players.length < 2) {
+
+        alert(
+            "Please add at least 2 players."
+        );
+
+        return;
+
+    }
+
+
+    usedWords.clear();
+
+    currentPlayerIndex = 0;
+
+    currentRound = 1;
+
+    players.forEach(function(player) {
+
+        player.score = 0;
+
+    });
+
+
+    showScreen("gameScreen");
+
+    setupTurn();
+
+}
+
+
+/* =====================================================
+   SETUP TURN
+===================================================== */
+
+function setupTurn() {
+
+    stopTimer();
+
+
+    selectedWord = "";
+
+    selectedLevel = "";
+
+    selectedPoints = 0;
+
+    turnFinished = false;
+
+    timeLeft = 60;
+
+
+    updateTimer();
+
+
+    const player =
+        players[currentPlayerIndex];
+
+
+    document
+        .getElementById("currentPlayer")
+        .textContent =
+            player.name;
+
+
+    document
+        .getElementById("roundNumber")
+        .textContent =
+            currentRound;
+
+
+    document
+        .getElementById("choiceArea")
+        .style.display =
+            "block";
+
+
+    document
+        .getElementById("selectedSection")
+        .classList.remove("active");
+
+
+    generateChoices();
+
+    updateScoreboard();
+
+}
+
+
+/* =====================================================
+   GENERATE WORD CHOICES
+===================================================== */
+
+function generateChoices() {
+
+    const easy =
+        getUnusedWord("easy");
+
+    const medium =
+        getUnusedWord("medium");
+
+    const hard =
+        getUnusedWord("hard");
+
+
+    if (
+        easy === null ||
+        medium === null ||
+        hard === null
+    ) {
+
+        endGame();
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("easyWord")
+        .textContent =
+            easy;
+
+
+    document
+        .getElementById("mediumWord")
+        .textContent =
+            medium;
+
+
+    document
+        .getElementById("hardWord")
+        .textContent =
+            hard;
+
+
+    document
+        .getElementById("easyChoice")
+        .dataset.word =
+            easy;
+
+
+    document
+        .getElementById("mediumChoice")
+        .dataset.word =
+            medium;
+
+
+    document
+        .getElementById("hardChoice")
+        .dataset.word =
+            hard;
+
+}
+
+
+/* =====================================================
+   GET UNUSED WORD
+===================================================== */
+
+function getUnusedWord(level) {
+
+    const available =
+        wordBank[level].filter(function(word) {
+
+            return !usedWords.has(word);
+
+        });
+
+
+    if (available.length === 0) {
+
+        return null;
+
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            available.length
+        );
+
+
+    return available[randomIndex];
+
+}
+
+
+/* =====================================================
+   CHOOSE WORD
+===================================================== */
+
+function chooseWord(level) {
+
+    if (selectedWord !== "") {
+
+        return;
+
+    }
+
+
+    const card =
+        document.getElementById(
+            level + "Choice"
+        );
+
+
+    const word =
+        card.dataset.word;
+
+
+    if (!word) {
+
+        return;
+
+    }
+
+
+    selectedWord = word;
+
+    selectedLevel = level;
+
+
+    if (level === "easy") {
+
+        selectedPoints = 1;
+
+    }
+
+    else if (level === "medium") {
+
+        selectedPoints = 2;
+
+    }
+
+    else {
+
+        selectedPoints = 3;
+
+    }
+
+
+    /*
+       Word becomes permanently used.
+    */
+
+    usedWords.add(selectedWord);
+
+
+    document
+        .getElementById("selectedWord")
+        .textContent =
+            selectedWord;
+
+
+    document
+        .getElementById("selectedPoints")
+        .textContent =
+            "⭐ Worth " +
+            selectedPoints +
+            " point" +
+            (
+                selectedPoints > 1
+                    ? "s"
+                    : ""
+            );
+
+
+    document
+        .getElementById("choiceArea")
+        .style.display =
+            "none";
+
+
+    document
+        .getElementById("selectedSection")
+        .classList.add("active");
+
+
+    document
+        .querySelector(".turn-info")
+        .textContent =
+            "Your 60 seconds have started!";
+
+
+    startTimer();
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startTimer() {
+
+    stopTimer();
+
+
+    timeLeft = 60;
+
+    updateTimer();
+
+
+    timerInterval =
+        setInterval(function() {
+
+            timeLeft--;
+
+            updateTimer();
+
+
+            if (timeLeft <= 0) {
+
+                stopTimer();
+
+                finishTurn();
+
+            }
+
+        }, 1000);
+
+}
+
+
+/* =====================================================
+   STOP TIMER
+===================================================== */
+
+function stopTimer() {
+
+    if (timerInterval !== null) {
+
+        clearInterval(
+            timerInterval
+        );
+
+        timerInterval = null;
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE TIMER
+===================================================== */
+
+function updateTimer() {
+
+    const timer =
+        document.getElementById(
+            "timer"
+        );
+
+
+    const minutes =
+        Math.floor(
+            timeLeft / 60
+        );
+
+
+    const seconds =
+        timeLeft % 60;
+
+
+    timer.textContent =
+        minutes +
+        ":" +
+        seconds
+            .toString()
+            .padStart(2, "0");
+
+
+    if (timeLeft <= 10) {
+
+        timer.classList.add(
+            "warning"
+        );
+
+    }
+
+    else {
+
+        timer.classList.remove(
+            "warning"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   FINISH TURN
+===================================================== */
+
+function finishTurn() {
+
+    if (turnFinished) {
+
+        return;
+
+    }
+
+
+    if (
+        selectedWord === "" ||
+        selectedPoints === 0
+    ) {
+
+        return;
+
+    }
+
+
+    turnFinished = true;
+
+
+    stopTimer();
+
+
+    const player =
+        players[currentPlayerIndex];
+
+
+    player.score +=
+        selectedPoints;
+
+
+    document
+        .getElementById("turnMessage")
+        .innerHTML =
+            "<strong>" +
+            escapeHTML(player.name) +
+            "</strong> completed their turn! 🎉";
+
+
+    document
+        .getElementById("turnWord")
+        .textContent =
+            "Word: " +
+            selectedWord;
+
+
+    document
+        .getElementById("turnPoints")
+        .textContent =
+            "+" +
+            selectedPoints +
+            " point" +
+            (
+                selectedPoints > 1
+                    ? "s"
+                    : ""
+            );
+
+
+    updateScoreboard();
+
+
+    showScreen(
+        "turnScreen"
+    );
+
+}
+
+
+/* =====================================================
+   NEXT PLAYER
+===================================================== */
+
+function nextPlayer() {
+
+    currentPlayerIndex++;
+
+
+    if (
+        currentPlayerIndex >=
+        players.length
+    ) {
+
+        currentPlayerIndex = 0;
+
+        currentRound++;
+
+    }
+
+
+    /*
+       If any difficulty has run out,
+       end the game.
+    */
+
+    const easyFinished =
+        wordBank.easy.every(
+            function(word) {
+
+                return usedWords.has(word);
+
+            }
+        );
+
+
+    const mediumFinished =
+        wordBank.medium.every(
+            function(word) {
+
+                return usedWords.has(word);
+
+            }
+        );
+
+
+    const hardFinished =
+        wordBank.hard.every(
+            function(word) {
+
+                return usedWords.has(word);
+
+            }
+        );
+
+
+    if (
+        easyFinished ||
+        mediumFinished ||
+        hardFinished
+    ) {
+
+        endGame();
+
+        return;
+
+    }
+
+
+    showScreen(
+        "gameScreen"
+    );
+
+
+    setupTurn();
+
+}
+
+
+/* =====================================================
+   SCOREBOARD
+===================================================== */
+
+function updateScoreboard() {
+
+    const board =
+        document.getElementById(
+            "scoreboard"
+        );
+
+
+    board.innerHTML = "";
+
+
+    const sorted =
+        [...players].sort(
+            function(a, b) {
+
+                return b.score - a.score;
+
+            }
+        );
+
+
+    sorted.forEach(
+        function(player, index) {
+
+            let medal = "";
+
+
+            if (index === 0) {
+
+                medal = "🥇";
+
+            }
+
+            else if (index === 1) {
+
+                medal = "🥈";
+
+            }
+
+            else if (index === 2) {
+
+                medal = "🥉";
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "score-row";
+
+
+            row.innerHTML = `
+
+                <span>
+                    ${medal}
+                    ${escapeHTML(player.name)}
+                </span>
+
+                <span class="score-points">
+                    ${player.score} pts
+                </span>
+
+            `;
+
+
+            board.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   END GAME
+===================================================== */
+
+function endGame() {
+
+    stopTimer();
+
+
+    const sorted =
+        [...players].sort(
+            function(a, b) {
+
+                return b.score - a.score;
+
+            }
+        );
+
+
+    if (sorted.length === 0) {
+
+        showScreen(
+            "setupScreen"
+        );
+
+        return;
+
+    }
+
+
+    const highestScore =
+        sorted[0].score;
+
+
+    /*
+       Handle a tie.
+    */
+
+    const winners =
+        sorted.filter(
+            function(player) {
+
+                return player.score ===
+                    highestScore;
+
+            }
+        );
+
+
+    let winnerText = "";
+
+
+    if (winners.length === 1) {
+
+        winnerText =
+            "🎉 " +
+            escapeHTML(
+                winners[0].name
+            ) +
+            " wins!";
+
+    }
+
+    else {
+
+        winnerText =
+            "🤝 It's a tie!<br>" +
+            winners
+                .map(function(player) {
+
+                    return escapeHTML(
+                        player.name
+                    );
+
+                })
+                .join(" & ");
+
+    }
+
+
+    document
+        .getElementById("winnerName")
+        .innerHTML =
+            winnerText;
+
+
+    const finalScores =
+        document.getElementById(
+            "finalScores"
+        );
+
+
+    finalScores.innerHTML = "";
+
+
+    sorted.forEach(
+        function(player, index) {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "score-row";
+
+
+            row.innerHTML = `
+
+                <span>
+                    ${index + 1}.
+                    ${escapeHTML(player.name)}
+                </span>
+
+                <span class="score-points">
+                    ${player.score} pts
+                </span>
+
+            `;
+
+
+            finalScores.appendChild(row);
+
+        }
+    );
+
+
+    showScreen(
+        "gameOverScreen"
+    );
+
+}
+
+
+/* =====================================================
+   RESTART GAME
+===================================================== */
+
+function restartGame() {
+
+    stopTimer();
+
+
+    players = [];
+
+    currentPlayerIndex = 0;
+
+    currentRound = 1;
+
+    usedWords.clear();
+
+    selectedWord = "";
+
+    selectedLevel = "";
+
+    selectedPoints = 0;
+
+    turnFinished = false;
+
+
+    document
+        .getElementById("playersList")
+        .innerHTML = "";
+
+
+    document
+        .getElementById("playerInput")
+        .value = "";
+
+
+    showScreen(
+        "setupScreen"
+    );
+
+}
+
+
+/* =====================================================
+   SHOW SCREEN
+===================================================== */
+
+function showScreen(id) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            function(screen) {
+
+                screen.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(id)
+        .classList.add(
+            "active"
+        );
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent = text;
+
+
+    return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
